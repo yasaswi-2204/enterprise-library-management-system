@@ -51,14 +51,12 @@ A modern full-stack library management platform built with **Next.js**, **TypeSc
 
 ---
 
-## Learning Outcomes
+## Key Highlights
 
-Through this project, I gained hands-on experience with:
-
-- Building scalable full-stack applications using Next.js
-- Implementing secure authentication and authorization
-- Designing relational databases with PostgreSQL and Drizzle ORM
-- Improving performance using Redis caching
-- Building reusable UI components
-- Managing server actions and API integrations
-- Deploying production-ready web applications
+- Developed a production-ready full-stack application using Next.js App Router and TypeScript.
+- Implemented secure authentication and role-based access control with Auth.js.
+- Designed and managed relational data using PostgreSQL and Drizzle ORM.
+- Improved application performance through Redis caching.
+- Built reusable UI components using Tailwind CSS and shadcn/ui.
+- Integrated third-party services including ImageKit, Resend, and Inngest.
+- Applied modern full-stack development practices for scalable web applications.
