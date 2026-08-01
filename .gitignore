@@ -19,6 +19,10 @@
 
 # production
 /build
+/dist
+
+#coverage
+/coverage
 
 # misc
 .DS_Store
@@ -30,11 +34,18 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files 
+.env
 .env.local
+.env.development.local
+.env.production.local
+.env.test.local
 
 # vercel
 .vercel
+
+#ide
+.idea/
 
 # typescript
 *.tsbuildinfo
