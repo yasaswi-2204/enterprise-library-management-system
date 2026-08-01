@@ -1,6 +1,6 @@
 "use client";
 
-import { IKImage, ImageKitProvider, IKUpload, IKVideo } from "imagekitio-next";
+import { IKImage, ImageKitProvider, IKUpload } from "imagekitio-next";
 import config from "@/lib/config";
 import ImageKit from "imagekit";
 import { useRef, useState } from "react";
@@ -16,19 +16,13 @@ const {
 
 const authenticator = async () => {
   try {
-    const response = await fetch(`${config.env.apiEndpoint}/api/auth/imagekit`);
+    const response = await fetch("/api/imagekit");
 
     if (!response.ok) {
-      const errorText = await response.text();
-
-      throw new Error(
-        `Request failed with status ${response.status}: ${errorText}`,
-      );
+      throw new Error(await response.text());
     }
 
-    const data = await response.json();
-
-    const { signature, expire, token } = data;
+    const { signature, expire, token } = await response.json();
 
     return { token, expire, signature };
   } catch (error: any) {
@@ -37,7 +31,6 @@ const authenticator = async () => {
 };
 
 interface Props {
-  type: "image" | "video";
   accept: string;
   placeholder: string;
   folder: string;
@@ -47,7 +40,6 @@ interface Props {
 }
 
 const FileUpload = ({
-  type,
   accept,
   placeholder,
   folder,
@@ -74,8 +66,8 @@ const FileUpload = ({
     console.log(error);
 
     toast({
-      title: `${type} upload failed`,
-      description: `Your ${type} could not be uploaded. Please try again.`,
+      title: "Image upload failed",
+      description: "Your image could not be uploaded. Please try again.",
       variant: "destructive",
     });
   };
@@ -85,31 +77,20 @@ const FileUpload = ({
     onFileChange(res.filePath);
 
     toast({
-      title: `${type} uploaded successfully`,
+      title: "Image uploaded successfully",
       description: `${res.filePath} uploaded successfully!`,
     });
   };
 
   const onValidate = (file: File) => {
-    if (type === "image") {
-      if (file.size > 20 * 1024 * 1024) {
-        toast({
-          title: "File size too large",
-          description: "Please upload a file that is less than 20MB in size",
-          variant: "destructive",
-        });
+    if (file.size > 20 * 1024 * 1024) {
+      toast({
+        title: "File size too large",
+        description: "Please upload a file that is less than 20MB in size",
+        variant: "destructive",
+      });
 
-        return false;
-      }
-    } else if (type === "video") {
-      if (file.size > 50 * 1024 * 1024) {
-        toast({
-          title: "File size too large",
-          description: "Please upload a file that is less than 50MB in size",
-          variant: "destructive",
-        });
-        return false;
-      }
+      return false;
     }
 
     return true;
@@ -172,21 +153,14 @@ const FileUpload = ({
         </div>
       )}
 
-      {file &&
-        (type === "image" ? (
-          <IKImage
-            alt={file.filePath}
-            path={file.filePath}
-            width={500}
-            height={300}
-          />
-        ) : type === "video" ? (
-          <IKVideo
-            path={file.filePath}
-            controls={true}
-            className="h-96 w-full rounded-xl"
-          />
-        ) : null)}
+      {file && (
+        <IKImage
+          alt={file.filePath}
+          path={file.filePath}
+          width={500}
+          height={300}
+        />
+      )}
     </ImageKitProvider>
   );
 };

@@ -5,11 +5,12 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
-import { borrowBook } from "@/lib/actions/book";
+import { borrowBook, returnBook } from "@/lib/actions/book";
 
 interface Props {
   userId: string;
   bookId: string;
+  hasBorrowed: boolean;
   borrowingEligibility: {
     isEligible: boolean;
     message: string;
@@ -19,32 +20,38 @@ interface Props {
 const BorrowBook = ({
   userId,
   bookId,
+  hasBorrowed,
   borrowingEligibility: { isEligible, message },
 }: Props) => {
   const router = useRouter();
   const [borrowing, setBorrowing] = useState(false);
 
   const handleBorrowBook = async () => {
-    if (!isEligible) {
+    if (!hasBorrowed && !isEligible) {
       toast({
         title: "Error",
         description: message,
         variant: "destructive",
       });
+      return;
     }
 
     setBorrowing(true);
 
     try {
-      const result = await borrowBook({ bookId, userId });
+      const result = hasBorrowed
+        ? await returnBook({ bookId, userId })
+        : await borrowBook({ bookId, userId });
 
       if (result.success) {
         toast({
           title: "Success",
-          description: "Book borrowed successfully",
+          description: hasBorrowed
+            ? "Book returned successfully"
+            : "Book borrowed successfully",
         });
 
-        router.push("/");
+        router.refresh();
       } else {
         toast({
           title: "Error",
@@ -52,10 +59,10 @@ const BorrowBook = ({
           variant: "destructive",
         });
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
-        description: "An error occurred while borrowing the book",
+        description: "Something went wrong.",
         variant: "destructive",
       });
     } finally {
@@ -71,7 +78,13 @@ const BorrowBook = ({
     >
       <Image src="/icons/book.svg" alt="book" width={20} height={20} />
       <p className="font-bebas-neue text-xl text-dark-100">
-        {borrowing ? "Borrowing ..." : "Borrow Book"}
+        {borrowing
+          ? hasBorrowed
+            ? "Returning..."
+            : "Borrowing..."
+          : hasBorrowed
+            ? "Return Book"
+            : "Borrow Book"}
       </p>
     </Button>
   );

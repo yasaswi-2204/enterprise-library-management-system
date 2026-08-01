@@ -4,13 +4,10 @@ interface Book {
   author: string;
   genre: string;
   rating: number;
+  coverUrl: string;
+  description: string;
   totalCopies: number;
   availableCopies: number;
-  description: string;
-  coverColor: string;
-  coverUrl: string;
-  videoUrl: string;
-  summary: string;
   createdAt: Date | null;
 }
 
@@ -28,11 +25,8 @@ interface BookParams {
   genre: string;
   rating: number;
   coverUrl: string;
-  coverColor: string;
   description: string;
   totalCopies: number;
-  videoUrl: string;
-  summary: string;
 }
 
 interface BorrowBookParams {

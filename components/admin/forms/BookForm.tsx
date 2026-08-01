@@ -18,8 +18,7 @@ import { bookSchema } from "@/lib/validations";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import FileUpload from "@/components/FileUpload";
-import ColorPicker from "@/components/admin/ColorPicker";
-import { createBook } from "@/lib/admin/actions/book";
+import { createBook, updateBook } from "@/lib/admin/actions/book";
 import { toast } from "@/hooks/use-toast";
 
 interface Props extends Partial<Book> {
@@ -32,29 +31,33 @@ const BookForm = ({ type, ...book }: Props) => {
   const form = useForm<z.infer<typeof bookSchema>>({
     resolver: zodResolver(bookSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      author: "",
-      genre: "",
-      rating: 1,
-      totalCopies: 1,
-      coverUrl: "",
-      coverColor: "",
-      videoUrl: "",
-      summary: "",
+      title: book.title ?? "",
+      description: book.description ?? "",
+      author: book.author ?? "",
+      genre: book.genre ?? "",
+      rating: book.rating ?? 1,
+      totalCopies: book.totalCopies ?? 1,
+      coverUrl: book.coverUrl ?? "",
     },
   });
 
   const onSubmit = async (values: z.infer<typeof bookSchema>) => {
-    const result = await createBook(values);
+    const result =
+      type === "update"
+        ? await updateBook(book.id!, values)
+        : await createBook(values);
 
     if (result.success) {
       toast({
         title: "Success",
-        description: "Book created successfully",
+        description:
+          type === "update"
+            ? "Book updated successfully"
+            : "Book created successfully",
       });
 
-      router.push(`/admin/books/${result.data.id}`);
+      router.refresh();
+      router.push("/admin/books");
     } else {
       toast({
         title: "Error",
@@ -141,6 +144,7 @@ const BookForm = ({ type, ...book }: Props) => {
                   type="number"
                   min={1}
                   max={5}
+                  step="0.1"
                   placeholder="Book rating"
                   {...field}
                   className="book-form_input"
@@ -184,7 +188,6 @@ const BookForm = ({ type, ...book }: Props) => {
               </FormLabel>
               <FormControl>
                 <FileUpload
-                  type="image"
                   accept="image/*"
                   placeholder="Upload a book cover"
                   folder="books/covers"
@@ -197,24 +200,7 @@ const BookForm = ({ type, ...book }: Props) => {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name={"coverColor"}
-          render={({ field }) => (
-            <FormItem className="flex flex-col gap-1">
-              <FormLabel className="text-base font-normal text-dark-500">
-                Primary Color
-              </FormLabel>
-              <FormControl>
-                <ColorPicker
-                  onPickerChange={field.onChange}
-                  value={field.value}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+
         <FormField
           control={form.control}
           name={"description"}
@@ -237,53 +223,8 @@ const BookForm = ({ type, ...book }: Props) => {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name={"videoUrl"}
-          render={({ field }) => (
-            <FormItem className="flex flex-col gap-1">
-              <FormLabel className="text-base font-normal text-dark-500">
-                Book Trailer
-              </FormLabel>
-              <FormControl>
-                <FileUpload
-                  type="video"
-                  accept="video/*"
-                  placeholder="Upload a book trailer"
-                  folder="books/videos"
-                  variant="light"
-                  onFileChange={field.onChange}
-                  value={field.value}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name={"summary"}
-          render={({ field }) => (
-            <FormItem className="flex flex-col gap-1">
-              <FormLabel className="text-base font-normal text-dark-500">
-                Book Summary
-              </FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Book summary"
-                  {...field}
-                  rows={5}
-                  className="book-form_input"
-                />
-              </FormControl>
-
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         <Button type="submit" className="book-form_btn text-white">
-          Add Book to Library
+          {type === "update" ? "Update Book" : "Add Book to Library"}
         </Button>
       </form>
     </Form>

@@ -5,7 +5,7 @@ import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { config } from "dotenv";
 
-config({ path: ".env.local" });
+config({ path: ".env" });
 
 const sql = neon(process.env.DATABASE_URL!);
 export const db = drizzle({ client: sql });
@@ -45,16 +45,15 @@ const seed = async () => {
         "/books/covers",
       )) as string;
 
-      const videoUrl = (await uploadToImageKit(
-        book.videoUrl,
-        `${book.title}.mp4`,
-        "/books/videos",
-      )) as string;
-
       await db.insert(books).values({
-        ...book,
+        title: book.title,
+        author: book.author,
+        genre: book.genre,
+        rating: book.rating,
+        totalCopies: book.totalCopies,
+        availableCopies: book.totalCopies,
+        description: book.description,
         coverUrl,
-        videoUrl,
       });
     }
 

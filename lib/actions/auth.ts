@@ -5,11 +5,10 @@ import { db } from "@/database/drizzle";
 import { users } from "@/database/schema";
 import { hash } from "bcryptjs";
 import { signIn } from "@/auth";
+import { AuthError } from "next-auth";
 import { headers } from "next/headers";
 import ratelimit from "@/lib/ratelimit";
 import { redirect } from "next/navigation";
-import { workflowClient } from "@/lib/workflow";
-import config from "@/lib/config";
 
 export const signInWithCredentials = async (
   params: Pick<AuthCredentials, "email" | "password">,
@@ -34,8 +33,30 @@ export const signInWithCredentials = async (
 
     return { success: true };
   } catch (error) {
-    console.log(error, "Signin error");
-    return { success: false, error: "Signin error" };
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case "CredentialsSignin":
+          return {
+            success: false,
+            error: "Invalid email or password.",
+          };
+
+        default:
+          return {
+            success: false,
+            error: "Authentication failed.",
+          };
+      }
+    }
+
+    if (!(error instanceof AuthError)) {
+      console.error(error);
+    }
+
+    return {
+      success: false,
+      error: "Something went wrong. Please try again.",
+    };
   }
 };
 
@@ -68,19 +89,36 @@ export const signUp = async (params: AuthCredentials) => {
       universityCard,
     });
 
-    await workflowClient.trigger({
-      url: `${config.env.prodApiEndpoint}/api/workflows/onboarding`,
-      body: {
-        email,
-        fullName,
-      },
-    });
-
     await signInWithCredentials({ email, password });
 
     return { success: true };
   } catch (error) {
     console.log(error, "Signup error");
     return { success: false, error: "Signup error" };
+  }
+};
+
+export const updateUserStatus = async (
+  userId: string,
+  status: "APPROVED" | "PENDING" | "REJECTED",
+) => {
+  try {
+    await db
+      .update(users)
+      .set({
+        status,
+      })
+      .where(eq(users.id, userId));
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.log(error);
+
+    return {
+      success: false,
+      error: "Failed to update user status.",
+    };
   }
 };
