@@ -5,6 +5,7 @@ import { useTransition } from "react";
 import { updateUserStatus } from "@/lib/actions/auth";
 import { InferSelectModel } from "drizzle-orm";
 import { users as usersTable } from "@/database/schema";
+import config from "@/lib/config";
 
 type User = InferSelectModel<typeof usersTable>;
 
@@ -16,12 +17,13 @@ const UserTable = ({ users }: { users: User[] }) => {
   return (
     <>
       <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
-        <table className="w-full">
+        <table className="min-w-full">
           <thead className="bg-slate-100">
             <tr>
               <th className="px-6 py-4 text-left">Name</th>
               <th className="px-6 py-4 text-left">Email</th>
               <th className="px-6 py-4 text-left">University ID</th>
+              <th className="px-6 py-4 text-left">ID Card</th>
               <th className="px-6 py-4 text-left">Status</th>
               <th className="px-6 py-4 text-left">Role</th>
               <th className="px-6 py-4 text-left">Actions</th>
@@ -36,6 +38,20 @@ const UserTable = ({ users }: { users: User[] }) => {
                 <td className="px-6 py-4">{user.email}</td>
 
                 <td className="px-6 py-4">{user.universityId}</td>
+
+                <td className="px-6 py-4">
+                  <a
+                    href={`${config.env.imagekit.urlEndpoint}${user.universityCard}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <img
+                      src={`${config.env.imagekit.urlEndpoint}${user.universityCard}`}
+                      alt="University ID"
+                      className="h-16 w-28 rounded-lg border border-slate-200 object-cover shadow transition duration-200 hover:scale-110 hover:shadow-lg"
+                    />
+                  </a>
+                </td>
 
                 <td className="px-6 py-4">
                   <span

@@ -11,8 +11,13 @@ const Page = async () => {
     .from(users)
     .where(eq(users.status, "PENDING"));
 
+  const approvedUsers = await db
+    .select()
+    .from(users)
+    .where(eq(users.status, "APPROVED"));
+
   return (
-    <section className="space-y-8">
+    <section className="space-y-8 mb-10">
       <div>
         <h1 className="text-3xl font-bold">Dashboard</h1>
         <p className="mt-2 text-gray-500">
@@ -37,8 +42,8 @@ const Page = async () => {
         </div>
 
         <div className="rounded-xl border bg-white p-6 shadow-sm">
-          <h3 className="text-sm text-gray-500">📖 Borrowed Books</h3>
-          <p className="mt-3 text-4xl font-bold">0</p>
+          <h3 className="text-sm text-gray-500">✅ Approved Users</h3>
+          <p className="mt-3 text-4xl font-bold">{approvedUsers.length}</p>
         </div>
       </div>
     </section>

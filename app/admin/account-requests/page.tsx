@@ -10,7 +10,7 @@ const Page = async () => {
     .where(eq(users.status, "PENDING"));
 
   return (
-    <div className="p-8">
+    <div className="mx-auto max-w-7xl p-8">
       <h1 className="mb-8 text-3xl font-bold">Account Requests</h1>
 
       <UserTable users={pendingUsers} />
