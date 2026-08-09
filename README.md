@@ -165,34 +165,6 @@ Major entities include:
 
 ---
 
-## 📷 Screenshots
-
-### Home Page
-
-_Add screenshot here_
-
-### Book Details
-
-_Add screenshot here_
-
-### Admin Dashboard
-
-_Add screenshot here_
-
-### User Management
-
-_Add screenshot here_
-
-### Book Management
-
-_Add screenshot here_
-
-### Account Approval
-
-_Add screenshot here_
-
----
-
 ## 👩‍💻 Author
 
 **Yasaswi Kopparapu**
